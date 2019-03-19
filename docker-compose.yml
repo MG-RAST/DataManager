@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment: 
+      - POSTGRES_USER:datamanager
+      - POSTGRES_PASSWORD:1234
+      - POSTGRES_DB:datamanager
+    volumes: 
+      - psql_data:/var/lib/postgresql/data
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  message-bus:
+    image: "rabbitmq:3"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ""
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    labels:
+      NAME: "message-bus"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+  
+volumes: 
+  psql_data:
