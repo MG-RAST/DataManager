@@ -2,7 +2,7 @@
 
 To initialize db:
 ```
-docker-compose run web /code/manage.py migrate
-docker-compose run web /code/manage.py createsuperuser 
+docker-compose run web /usr/src/app/manage.py migrate
+docker-compose run web /usr/src/app/manage.py createsuperuser 
 ```
 
