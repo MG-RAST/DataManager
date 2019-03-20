@@ -10,7 +10,11 @@ RUN apk update && apk add py3-psycopg2
 
 RUN apk add --no-cache postgresql-libs && \
     apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev && \
-    python3 -m pip install wheels/*.whl --no-cache-dir && \
+    if [ -d wheels ] ; then  \
+      python3 -m pip install wheels/*.whl --no-cache-dir ; \
+    else \
+      pip install -r requirements.txt ; \
+    fi && \
     apk --purge del .build-deps
       
       
