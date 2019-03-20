@@ -8,4 +8,4 @@ requests>=2.0,<3.0
 markdown>=3.0,<4.0
 PyLD>=1.0,<2.0
 serpy>=0.3.0,<0.4.0
-pika
+pika>=0.13.0,<0.14.0
