@@ -16,18 +16,29 @@ STATIC_URL = '/static/'
 # App settings
 WSGI_APPLICATION = 'DataManager.wsgi.application'
 
+
+auxdb_url = "postgresql://datamanager-auxdb@auxdb:26257?sslmode=disable"
+
 DATABASES = {
-    'default': {
+    'default': { # PGSQL
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': 'maindb',
+        'USER': 'www_user',
+        'PASSWORD': 'www_passwrd',
         'HOST': 'db',
         'PORT': 5432,
+    },
+    'auxdb': { # CockroachDB
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'datamanager_auxdb',
+        'USER': 'datamanager_user',
+        'HOST': 'auxdb',
+        'PORT': 26257,
     }
 } 
 
 INSTALLED_APPS = [
-    'DataManager.apps.DataManager',
+    # Library Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,6 +48,10 @@ INSTALLED_APPS = [
     'django_filters',
     'guardian',
     'rest_framework',
+    'notifications',
+
+    # Our Apps
+    'DataManager.DataManagerAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -79,18 +94,14 @@ REST_FRAMEWORK = {
     ]
 }
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+validators = ['UserAttributeSimilarityValidator', 'MinimumLengthValidator',
+                'CommonPasswordValidator', 'NumericPasswordValidator']
+AUTH_PASSWORD_VALIDATORS = [{'NAME': 'django.contrib.auth.password_validation.%s' % v} for v in validators]
 
+CELERY_TASK_ALWAYS_EAGER = True
+NOTIFICATIONS_CHANNELS = {
+    'console': 'notifications.channels.ConsoleChannel'
+}
+
+NOTIFICATIONS_USE_WEBSOCKET = True
+NOTIFICATIONS_RABBIT_MQ_URL = 'message-bus'

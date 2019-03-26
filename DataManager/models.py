@@ -16,7 +16,7 @@ from rest_framework.parsers import JSONParser
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        exclude = ['url', 'password']
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -70,7 +70,8 @@ class TypeViewSet(viewsets.ModelViewSet):
     queryset = Type.objects.all()
     serializer_class = TypeSerializer
 
-    @action(detail=False, methods=['post'], name='Validate instance of Type')
+    @action(detail=True, methods=['post'], name='Validate instance of Type',
+            url_path='validate_type', url_name='validate-instance-of-type')
     def validated(self, request, pk=None):
         pass
 

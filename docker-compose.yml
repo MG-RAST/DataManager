@@ -1,36 +1,61 @@
 version: '3'
 
 services:
+  ingress:
+    image: traefik:1.7-alpine 
+    container_name: ingress
+    command: -c /etc/traefik/traefik.toml
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./conf/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
   db:
     image: postgres
+    container_name: db
     environment: 
-      - POSTGRES_USER:datamanager
-      - POSTGRES_PASSWORD:1234
-      - POSTGRES_DB:datamanager
-    volumes: 
-      - psql_data:/var/lib/postgresql/data
+      - "POSTGRES_USER=www_user"
+      - "POSTGRES_PASSWORD=www_passwrd"
+      - "POSTGRES_DB=maindb"
+      - "POSTGRES_DATA=/pgdata"
+    volumes:
+      - psql_data:/pgdata
+    ports: 
+      - "5432"
+  auxdb:
+    image: cockroachdb/cockroach
+    container_name: auxdb
+    command: start --insecure --listen-addr=auxdb:26257
+    volumes:
+      - cockroachdb_data:/cockroach
+    ports: 
+      - "26257"
+  message-bus:
+    image: "rabbitmq:3.7-management-alpine"
+    container_name: message-bus
+    volumes:
+      - ./conf/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - rmq_data:/var/lib/rabbitmq
+    ports:
+      - "15672"
+      - "5672"
   web:
     build: .
-    image: web
-    command: python manage.py runserver 0.0.0.0:8000
+    container_name: web
+    command: start
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=8000"
+      - "traefik.protocol=http"
     volumes:
       - .:/usr/src/app
     ports:
-      - "8000:8000"
+      - "80:8000"
     depends_on:
       - db
-  message-bus:
-    image: "rabbitmq:3"
-    environment:
-      RABBITMQ_ERLANG_COOKIE: ""
-      RABBITMQ_DEFAULT_USER: "rabbitmq"
-      RABBITMQ_DEFAULT_PASS: "rabbitmq"
-      RABBITMQ_DEFAULT_VHOST: "/"
-    labels:
-      NAME: "message-bus"
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+      - message-bus
 
 volumes: 
   psql_data:
+  rmq_data:
+  cockroachdb_data:

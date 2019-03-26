@@ -1,0 +1,26 @@
+################################################################
+# Global configuration
+################################################################
+
+debug = false
+logLevel = "INFO"
+
+[api] # enable webui & rest interface
+[accessLog]
+
+################################################################
+# File configuration backend
+################################################################
+
+[entryPoints.http]
+address = ":80"
+compress = true
+
+################################################################
+# Docker configuration backend
+################################################################
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+watch = true
+exposedByDefault = false
