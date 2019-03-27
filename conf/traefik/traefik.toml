@@ -1,11 +1,17 @@
 ################################################################
+#             Traefik 1.7 configuration file
+################################################################
+
+################################################################
 # Global configuration
 ################################################################
 
-debug = false
+debug = true
 logLevel = "INFO"
 
-[api] # enable webui & rest interface
+[api] # enables dashboard & REST api (defaults to bind port)
+
+[traefikLog]
 [accessLog]
 
 ################################################################
@@ -23,4 +29,5 @@ compress = true
 [docker]
 endpoint = "unix:///var/run/docker.sock"
 watch = true
-exposedByDefault = false
+exposedByDefault = false # Disable auto configuration
+usebindportip = false # Routes public ip to private ip

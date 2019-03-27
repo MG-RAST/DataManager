@@ -10,11 +10,12 @@ ROOT_URLCONF = 'DataManager.urls'
 # default db: DBNAME, DBUSER, DBPASSWORD, DBHOST, DBPORT
 # roach db  : ROACH_DBNAME, ROACH_USER, ROACH_DBPASSWORD,
 #             ROACH_DBHOST, ROACH_DBPORT
-# django    : DEBUG, BASE_DIR, SECRET_KEY
+# django    : DEBUG, BASE_DIR, SECRET_KEY, DJANGO_PORT
 
 # Alias environ getter for legiblity
 env=os.environ.get
 
+DJANGO_PORT = env('DJANGO_PORT')
 ALLOWED_HOSTS = [env('ALLOWED_HOSTS', '*')]
 DEBUG = env('DEBUG', True)
 BASE_DIR = env('BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

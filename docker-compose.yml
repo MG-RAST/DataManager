@@ -6,8 +6,7 @@ services:
     container_name: ingress
     command: -c /etc/traefik/traefik.toml
     ports:
-      # traefik also binds port 80 on startup
-      - "8080:8080"
+      - "8080:8080" # Dashboard port
     volumes:
       - ./conf/traefik/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
@@ -18,15 +17,14 @@ services:
       - "POSTGRES_USER=www_user"
       - "POSTGRES_PASSWORD=www_passwrd"
       - "POSTGRES_DB=maindb"
-      - "POSTGRES_DATA=/pgdata"
     volumes:
-      - pgdata:/pgdata
+      - pgdata:/var/lib/postgresql/data
     ports: 
-      - "5432"
+      - "5432:5432"
   roachdb:
     image: cockroachdb/cockroach
     container_name: roachdb
-    command: start --insecure --listen-addr=auxdb:26257
+    command: start --insecure --listen-addr=roachdb:26257
     volumes:
       - roachdata:/cockroach
     ports: 
@@ -34,22 +32,28 @@ services:
   message-bus:
     image: "rabbitmq:3.7-management-alpine"
     container_name: message-bus
+    labels:
+      - "traefik.domain=mg-rast.local"
+      - "traefik.backend=message-bus_admin"
+      - "traefik.enable=true"
     volumes:
       - ./conf/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - rabbitdata:/var/lib/rabbitmq
     ports:
-      - "15672" # Management UI
+      - "8888:15672" # Admin UI port
       - "5672"
   web:
     build: .
     container_name: web
     command: start
     labels:
+      - "traefik.domain=mg-rast.local"
+      - "traefik.backend=web"
       - "traefik.enable=true"
     volumes:
       - .:/usr/src/app
     ports:
-      - "8000"
+      - "80:8000"
     depends_on:
       - db
       - message-bus
