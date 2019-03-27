@@ -1,44 +1,51 @@
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = '1q+1hce++u&uhek_)f2c7xju%e&(e^0a&9_2i&w*1_ej7+5ivh'
-DEBUG = True
-ALLOWED_HOSTS = ['*']
-
-# Internationalization settings
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
-STATIC_URL = '/static/'
-
-# App settings
+# App settings model
 WSGI_APPLICATION = 'DataManager.wsgi.application'
+ROOT_URLCONF = 'DataManager.urls'
 
+#                    ENV Setting
+# usage       names
+# ----------  ------------------------------------------
+# default db: DBNAME, DBUSER, DBPASSWORD, DBHOST, DBPORT
+# roach db  : ROACH_DBNAME, ROACH_USER, ROACH_DBPASSWORD,
+#             ROACH_DBHOST, ROACH_DBPORT
+# django    : DEBUG, BASE_DIR, SECRET_KEY
 
-auxdb_url = "postgresql://datamanager-auxdb@auxdb:26257?sslmode=disable"
+# Alias environ getter for legiblity
+env=os.environ.get
+
+ALLOWED_HOSTS = [env('ALLOWED_HOSTS', '*')]
+DEBUG = env('DEBUG', True)
+BASE_DIR = env('BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SECRET_KEY = env('SECRET_KEY', '1q+1hce++u&uhek_)f2c7xju%e&(e^0a&9_2i&w*1_ej7+5ivh')
 
 DATABASES = {
-    'default': { # PGSQL
+    # PGSQL Main db
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'maindb',
-        'USER': 'www_user',
-        'PASSWORD': 'www_passwrd',
-        'HOST': 'db',
-        'PORT': 5432,
+        'NAME': env('DBNAME', 'maindb'),
+        'USER': env('DBUSER', 'www_user'),
+        'PASSWORD': env('DBPASSWORD','www_passwrd'),
+        'HOST': env('DBHOST','db'),
+        'PORT': env(int('DBPORT'), 5432)
     },
-    'auxdb': { # CockroachDB
+    # CockroachDB
+    # example connection url "postgresql://www_user@cockroachdb:26257?sslmode=disable"
+    'roach': { 
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'datamanager_auxdb',
-        'USER': 'datamanager_user',
-        'HOST': 'auxdb',
-        'PORT': 26257,
+        'NAME': env('ROACH_DBNAME', 'roachdb'),
+        'USER': env('ROACH_DBUSER', 'www_user'),
+        'HOST': env('ROACH_DBHOST', 'roachdb')
+        'PORT': env(int('ROACH_DBPORT'), 26257)
     }
-} 
+}
+
+# Internationalization settings
+LANGUAGE_CODE, TIME_ZONE, STATIC_URL = 'en-us', 'UTC', '/static/'
+USE_L10N = USE_I18N = USE_TZ = True
 
 INSTALLED_APPS = [
-    # Library Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,8 +56,6 @@ INSTALLED_APPS = [
     'guardian',
     'rest_framework',
     'notifications',
-
-    # Our Apps
     'DataManager.DataManagerAppConfig',
 ]
 
@@ -69,35 +74,36 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
-ROOT_URLCONF = 'DataManager.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [],
+    'APP_DIRS': True,
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.debug',
+            'django.template.context_processors.request',
+            'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
+        ],
     },
-]
+}]
 
+# Django REST framework settings
 REST_FRAMEWORK = {
     # Read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly']
 }
 
-validators = ['UserAttributeSimilarityValidator', 'MinimumLengthValidator',
-                'CommonPasswordValidator', 'NumericPasswordValidator']
-AUTH_PASSWORD_VALIDATORS = [{'NAME': 'django.contrib.auth.password_validation.%s' % v} for v in validators]
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': validator} for validator in [
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'django.contrib.auth.password_validation.CommonPasswordValidator', 
+        'django.contrib.auth.password_validation.NumericPasswordValidator'
+    ]
+]
 
+# Notify package settings
 CELERY_TASK_ALWAYS_EAGER = True
 NOTIFICATIONS_CHANNELS = {
     'console': 'notifications.channels.ConsoleChannel'
