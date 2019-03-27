@@ -6,6 +6,7 @@ services:
     container_name: ingress
     command: -c /etc/traefik/traefik.toml
     ports:
+      # traefik also binds port 80 on startup
       - "8080:8080"
     volumes:
       - ./conf/traefik/traefik.toml:/etc/traefik/traefik.toml
@@ -19,15 +20,15 @@ services:
       - "POSTGRES_DB=maindb"
       - "POSTGRES_DATA=/pgdata"
     volumes:
-      - psql_data:/pgdata
+      - pgdata:/pgdata
     ports: 
       - "5432"
-  auxdb:
+  roachdb:
     image: cockroachdb/cockroach
-    container_name: auxdb
+    container_name: roachdb
     command: start --insecure --listen-addr=auxdb:26257
     volumes:
-      - cockroachdb_data:/cockroach
+      - roachdata:/cockroach
     ports: 
       - "26257"
   message-bus:
@@ -35,9 +36,9 @@ services:
     container_name: message-bus
     volumes:
       - ./conf/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-      - rmq_data:/var/lib/rabbitmq
+      - rabbitdata:/var/lib/rabbitmq
     ports:
-      - "15672"
+      - "15672" # Management UI
       - "5672"
   web:
     build: .
@@ -45,17 +46,15 @@ services:
     command: start
     labels:
       - "traefik.enable=true"
-      - "traefik.port=8000"
-      - "traefik.protocol=http"
     volumes:
       - .:/usr/src/app
     ports:
-      - "80:8000"
+      - "8000"
     depends_on:
       - db
       - message-bus
 
 volumes: 
-  psql_data:
-  rmq_data:
-  cockroachdb_data:
+  pgdata:
+  rabbitdata:
+  roachdata:

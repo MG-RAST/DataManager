@@ -28,7 +28,7 @@ DATABASES = {
         'USER': env('DBUSER', 'www_user'),
         'PASSWORD': env('DBPASSWORD','www_passwrd'),
         'HOST': env('DBHOST','db'),
-        'PORT': env(int('DBPORT'), 5432)
+        'PORT': int(env('ROACH_DBPORT', 5432))
     },
     # CockroachDB
     # example connection url "postgresql://www_user@cockroachdb:26257?sslmode=disable"
@@ -36,8 +36,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': env('ROACH_DBNAME', 'roachdb'),
         'USER': env('ROACH_DBUSER', 'www_user'),
-        'HOST': env('ROACH_DBHOST', 'roachdb')
-        'PORT': env(int('ROACH_DBPORT'), 26257)
+        'HOST': env('ROACH_DBHOST', 'roachdb'),
+        'PORT': int(env('ROACH_DBPORT', 26257))
     }
 }
 
