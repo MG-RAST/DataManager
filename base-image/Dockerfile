@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /usr/src/base
 COPY . .
 
-RUN apk update && apk add --no-cache py3-psycopg2; \
+RUN apk update && apk add --no-cache py3-psycopg2 postgresql-client; \
     apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-libs postgresql-dev; \
     pip install wheels/*.whl --no-cache-dir; \
     pip install -r requirements.txt --no-cache-dir; \
