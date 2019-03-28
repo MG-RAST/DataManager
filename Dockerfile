@@ -1,3 +1,4 @@
+# Build mgrast/django-base via django-python-base.dockerfile
 FROM mgrast/django-base:latest
 ENV PYTHONUNBUFFERED 1
 

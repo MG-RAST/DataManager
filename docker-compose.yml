@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+
   ingress:
     image: traefik:1.7-alpine 
     container_name: ingress
@@ -8,8 +9,9 @@ services:
     ports:
       - "8080:8080" # Dashboard port
     volumes:
-      - ./conf/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - ./conf/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
+
   db:
     image: postgres
     container_name: db
@@ -21,6 +23,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports: 
       - "5432:5432"
+
   roachdb:
     image: cockroachdb/cockroach
     container_name: roachdb
@@ -29,6 +32,7 @@ services:
       - roachdata:/cockroach
     ports: 
       - "26257"
+
   message-bus:
     image: "rabbitmq:3.7-management-alpine"
     container_name: message-bus
@@ -37,11 +41,12 @@ services:
       - "traefik.backend=message-bus_admin"
       - "traefik.enable=true"
     volumes:
-      - ./conf/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - rabbitdata:/var/lib/rabbitmq
     ports:
       - "8888:15672" # Admin UI port
       - "5672"
+
   web:
     build: .
     container_name: web

@@ -1,0 +1,33 @@
+################################################################
+#             Traefik 1.7 configuration file
+################################################################
+
+################################################################
+# Global configuration
+################################################################
+
+debug = false
+logLevel = "ERROR"
+
+[api] # enables dashboard & REST api (defaults to bind port)
+
+[traefikLog]
+[accessLog]
+
+################################################################
+# File configuration backend
+################################################################
+
+[entryPoints.http]
+address = ":80"
+compress = true
+
+################################################################
+# Docker configuration backend
+################################################################
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+watch = true
+exposedByDefault = false # Disable auto configuration
+usebindportip = false # Routes public ip to private ip

@@ -4,22 +4,27 @@ import os
 WSGI_APPLICATION = 'DataManager.wsgi.application'
 ROOT_URLCONF = 'DataManager.urls'
 
-#                    ENV Setting
-# usage       names
-# ----------  ------------------------------------------
-# default db: DBNAME, DBUSER, DBPASSWORD, DBHOST, DBPORT
-# roach db  : ROACH_DBNAME, ROACH_USER, ROACH_DBPASSWORD,
-#             ROACH_DBHOST, ROACH_DBPORT
-# django    : DEBUG, BASE_DIR, SECRET_KEY, DJANGO_PORT
+# Enviroment Override Settings
+# --------------------------------------------------------------
+# usage        names
+# ------------ -------------------------------------------------
+# default db : DBNAME, DBUSER, DBPASSWORD, DBHOST, DBPORT
+# ------------ -------------------------------------------------
+# roachdb    : ROACH_DBNAME, ROACH_USER, ROACH_DBPASSWORD,
+#            : ROACH_DBHOST, ROACH_DBPORT
+# ------------ -------------------------------------------------
+# django     : DJANGO_DEBUG, DJANGO_BASE_DIR, DJANGO_SECRET_KEY, 
+#            : DJANGO_PORT, DJANGO_ALLOWED_HOSTS
+# ------------ -------------------------------------------------
 
 # Alias environ getter for legiblity
 env=os.environ.get
 
 DJANGO_PORT = env('DJANGO_PORT')
-ALLOWED_HOSTS = [env('ALLOWED_HOSTS', '*')]
-DEBUG = env('DEBUG', True)
-BASE_DIR = env('BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SECRET_KEY = env('SECRET_KEY', '1q+1hce++u&uhek_)f2c7xju%e&(e^0a&9_2i&w*1_ej7+5ivh')
+ALLOWED_HOSTS = [env('DJANGO_ALLOWED_HOSTS', '*')]
+DEBUG = env('DJANGO_DEBUG', True)
+BASE_DIR = env('DJANGO_BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SECRET_KEY = env('DJANGO_SECRET_KEY', '1q+1hce++u&uhek_)f2c7xju%e&(e^0a&9_2i&w*1_ej7+5ivh')
 
 DATABASES = {
     # PGSQL Main db
