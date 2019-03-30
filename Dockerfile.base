@@ -1,0 +1,14 @@
+FROM python:3.7-alpine3.9
+ENV PYTHONUNBUFFERED 1
+
+COPY requirements.txt .
+
+RUN apk update && apk add --no-cache --virtual .build-deps \
+    py3-psycopg2 postgresql-client gcc mariadb-dev musl-dev postgresql-libs postgresql-dev && \
+    pip3 install -r requirements.txt --no-cache-dir && \
+    pip3 install mysqlclient  --no-cache-dir && \
+    apk --purge del .build-deps && \
+    apk --no-cache add libpq py3-mysqlclient mysql-client
+
+ENTRYPOINT ["ash"]
+

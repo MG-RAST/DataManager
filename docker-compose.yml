@@ -2,68 +2,85 @@ version: '3'
 
 services:
 
-  ingress:
+  traefik:
     image: traefik:1.7-alpine 
-    container_name: ingress
+    container_name: traefik
     command: -c /etc/traefik/traefik.toml
     ports:
       - "8080:8080" # Dashboard port
     volumes:
-      - ./conf/traefik.toml:/etc/traefik/traefik.toml
+      - ./services/conf/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
 
-  db:
+  postgresql:
     image: postgres
-    container_name: db
+    container_name: postgresql
     environment: 
       - "POSTGRES_USER=www_user"
       - "POSTGRES_PASSWORD=www_passwrd"
       - "POSTGRES_DB=maindb"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./services/postgres_data:/var/lib/postgresql/data
     ports: 
       - "5432:5432"
 
-  roachdb:
-    image: cockroachdb/cockroach
-    container_name: roachdb
-    command: start --insecure --listen-addr=roachdb:26257
-    volumes:
-      - roachdata:/cockroach
-    ports: 
-      - "26257"
+  #roachdb:
+  #  # Connection url "postgresql://www_user@roachdb:26257?sslmode=disable"
+  #  image: cockroachdb/cockroach
+  #  container_name: roachdb
+  #  command: start --insecure --listen-addr=roachdb:26257
+  #  labels:
+  #    - "traefik.domain=mg-rast.local"
+  #    - "traefik.backend=roachdb-ui"
+  #    - "traefik.enable=true"
+  #    - "traefik.port=8800"
+  #  volumes:
+  #    - ./services/roach_data:/cockroach/cockroach-data
+  #  ports: 
+  #    - "8800:8080"
+  #    - "26257:26257"
 
-  message-bus:
-    image: "rabbitmq:3.7-management-alpine"
-    container_name: message-bus
-    labels:
-      - "traefik.domain=mg-rast.local"
-      - "traefik.backend=message-bus_admin"
-      - "traefik.enable=true"
-    volumes:
-      - ./conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-      - rabbitdata:/var/lib/rabbitmq
+  mysql:
+    image: mysql:5.7 
+    container_name: mysql
+    command: --skip-name-resolve --log_error_verbosity 1
+    environment: 
+      - "MYSQL_ROOT_PASSWORD=mypwd"
     ports:
-      - "8888:15672" # Admin UI port
-      - "5672"
+      - "3306:3306"
+    volumes:
+      - ./services/mysql_data:/var/lib/mysql
 
-  web:
+  #rabbit:
+  #  image: "rabbitmq:3.7-management-alpine"
+  #  container_name: rabbit
+  #  labels:
+  #    - "traefik.domain=mg-rast.local"
+  #    - "traefik.backend=message-bus_admin"
+  #    - "traefik.enable=true"
+  #  volumes:
+  #    - ./services/conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+  #    - rabbitdata:/var/lib/rabbitmq
+  #  ports:
+  #    - "8888:15672" # Admin UI port
+  #    - "5672"
+
+  django:
     build: .
-    container_name: web
+    container_name: django
     command: start
     labels:
       - "traefik.domain=mg-rast.local"
-      - "traefik.backend=web"
+      - "traefik.backend=django"
       - "traefik.enable=true"
     volumes:
       - .:/usr/src/app
     ports:
       - "80:8000"
     depends_on:
-      - db
-      - message-bus
+      - postgresql
+      #- roachdb
+      - mysql
 
-volumes: 
-  pgdata:
+volumes:
   rabbitdata:
-  roachdata:

@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import path
-
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import JSONParser

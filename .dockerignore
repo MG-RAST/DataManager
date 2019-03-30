@@ -1,0 +1,8 @@
+.DS_Store
+.vscode
+.git
+.gitignore
+services
+!services/wait-for
+Dockerfile
+README.md

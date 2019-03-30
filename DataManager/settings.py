@@ -4,18 +4,19 @@ import os
 WSGI_APPLICATION = 'DataManager.wsgi.application'
 ROOT_URLCONF = 'DataManager.urls'
 
-# Enviroment Override Settings
-# --------------------------------------------------------------
-# usage        names
-# ------------ -------------------------------------------------
-# default db : DBNAME, DBUSER, DBPASSWORD, DBHOST, DBPORT
-# ------------ -------------------------------------------------
-# roachdb    : ROACH_DBNAME, ROACH_USER, ROACH_DBPASSWORD,
-#            : ROACH_DBHOST, ROACH_DBPORT
-# ------------ -------------------------------------------------
-# django     : DJANGO_DEBUG, DJANGO_BASE_DIR, DJANGO_SECRET_KEY, 
-#            : DJANGO_PORT, DJANGO_ALLOWED_HOSTS
-# ------------ -------------------------------------------------
+# --------------------------------------------------------------#
+# Enviroment Override Settings                                  #
+# --------------------------------------------------------------#
+# usage      : names                                            #
+# -----------:--------------------------------------------------#
+# default db : DBNAME, DBUSER, DBPASSWORD, DBHOST, DBPORT       #
+# -----------:--------------------------------------------------#
+# roachdb    : ROACH_DBNAME, ROACH_USER, ROACH_DBPASSWORD,      #
+#            : ROACH_DBHOST, ROACH_DBPORT                       #
+# -----------:--------------------------------------------------#
+# django     : DJANGO_DEBUG, DJANGO_BASE_DIR, DJANGO_SECRET_KEY,#
+#            : DJANGO_PORT, DJANGO_ALLOWED_HOSTS                #
+# --------------------------------------------------------------#
 
 # Alias environ getter for legiblity
 env=os.environ.get
@@ -33,18 +34,25 @@ DATABASES = {
         'NAME': env('DBNAME', 'maindb'),
         'USER': env('DBUSER', 'www_user'),
         'PASSWORD': env('DBPASSWORD','www_passwrd'),
-        'HOST': env('DBHOST','db'),
-        'PORT': int(env('ROACH_DBPORT', 5432))
+        'HOST': env('DBHOST','postgresql'),
+        'PORT': int(env('DBPORT', 5432))
     },
-    # CockroachDB
-    # example connection url "postgresql://www_user@cockroachdb:26257?sslmode=disable"
-    'roach': { 
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('ROACH_DBNAME', 'roachdb'),
-        'USER': env('ROACH_DBUSER', 'www_user'),
-        'HOST': env('ROACH_DBHOST', 'roachdb'),
-        'PORT': int(env('ROACH_DBPORT', 26257))
-    }
+    # Experimental CockroachDB
+    #'roach': { 
+    #    'ENGINE': 'django.db.backends.postgresql',
+    #    'NAME': env('ROACH_DBNAME', 'expdb'),
+    #    'USER': env('ROACH_DBUSER', 'www_user'),
+    #    'HOST': env('ROACH_DBHOST', 'roachdb'),
+    #    'PORT': int(env('ROACH_DBPORT', 26257))
+    #},
+    # Legacy mysql db
+    'ppo': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'JobDB',
+        'PASSWORD': 'mypwd',
+        'HOST': 'mysql',
+        'PORT': 3306
+    },
 }
 
 # Internationalization settings
@@ -58,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'django_filters',
     'guardian',
     'rest_framework',
@@ -110,10 +119,30 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Notify package settings
-CELERY_TASK_ALWAYS_EAGER = True
-NOTIFICATIONS_CHANNELS = {
-    'console': 'notifications.channels.ConsoleChannel'
-}
+#CELERY_TASK_ALWAYS_EAGER = True
+#NOTIFICATIONS_CHANNELS = {'console': 'notifications.channels.ConsoleChannel'}
 
-NOTIFICATIONS_USE_WEBSOCKET = True
-NOTIFICATIONS_RABBIT_MQ_URL = 'message-bus'
+#NOTIFICATIONS_USE_WEBSOCKET = True
+#NOTIFICATIONS_RABBIT_MQ_URL = 'message-bus'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'ERROR'
+        },
+        'werkzeug': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

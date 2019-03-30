@@ -1,16 +1,14 @@
-from django.db import models
+from django.db.models import Model, IntegerField, CharField, BooleanField, DateTimeField
 
 
-class PPOModel(models.Model):
+class PPOModel(Model):
     '''
     Base class for PPOModels
     '''
+    _id = IntegerField()
 
-    class Meta:
+    Meta:
         abstract = True
-
-    # Base
-    _id = models.IntegerField()
 
 
 class Backend(PPOModel):
@@ -28,7 +26,7 @@ class Backend(PPOModel):
             UNIQUE KEY `Backend_unique_0` (`name`)
             ) ENGINE=InnoDB AUTO_INCREMENT=435 DEFAULT CHARSET=latin1;
     '''
-    name = models.CharField()
+    name = CharField()
     
 
 class Invitation(PPOModel):
@@ -55,16 +53,16 @@ class Invitation(PPOModel):
             PRIMARY KEY (`_id`)
             ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
     '''
-    invitation_date = models.DateTimeField()
-    email = models.CharField()
-    user_claimed = models.IntegerField()
-    _user_claimed_db = models.IntegerField()
-    user_inviting = models.IntegerField()
-    _user_inviting_db = models.IntegerField()
-    claimed = models.IntegerField()
-    scope = models.IntegerField()
-    _scope_db = models.IntegerField()
-    invitation_string = models.CharField()
+    invitation_date = DateTimeField()
+    email = CharField()
+    user_claimed = IntegerField()
+    _user_claimed_db = IntegerField()
+    user_inviting = IntegerField()
+    _user_inviting_db = IntegerField()
+    claimed = IntegerField()
+    scope = IntegerField()
+    _scope_db = IntegerField()
+    invitation_string = CharField()
 
 
 class Organization(PPOModel):
@@ -90,15 +88,15 @@ class Organization(PPOModel):
             UNIQUE KEY `Organization_unique_0` (`name`)
             ) ENGINE=InnoDB AUTO_INCREMENT=6624 DEFAULT CHARSET=latin1;
     '''
-    country = models.CharField()
-    city = models.CharField()
-    date = models.DateTimeField()
-    url = models.CharField()
-    name = models.CharField()
-    abbreviation = models.CharField()
-    scope = models.IntegerField()
-    _scope_db = models.IntegerField()    
-    location = models.CharField()
+    country = CharField()
+    city = CharField()
+    date = DateTimeField()
+    url = CharField()
+    name = CharField()
+    abbreviation = CharField()
+    scope = IntegerField()
+    _scope_db = IntegerField()    
+    location = CharField()
 
 
 class OrganizationUsers(PPOModel):
@@ -118,10 +116,10 @@ class OrganizationUsers(PPOModel):
             PRIMARY KEY (`_id`)
             ) ENGINE=InnoDB AUTO_INCREMENT=36923 DEFAULT CHARSET=latin1;
     '''
-    user = models.IntegerField()
-    _user_db = models.IntegerField()
-    organization = models.IntegerField()
-    _organization_db = models.IntegerField()
+    user = IntegerField()
+    _user_db = IntegerField()
+    organization = IntegerField()
+    _organization_db = IntegerField()
 
 
 class Preferences(PPOModel):
@@ -146,12 +144,12 @@ class Preferences(PPOModel):
             KEY `Preferences_value` (`value`)
             ) ENGINE=InnoDB AUTO_INCREMENT=1786443 DEFAULT CHARSET=latin1;
     '''
-    value = models.CharField()
-    user = models.IntegerField()
-    _user_db = models.IntegerField()
-    application = models.IntegerField()
-    _application_db = models.IntegerField()    
-    name = models.CharField()
+    value = CharField()
+    user = IntegerField()
+    _user_db = IntegerField()
+    application = IntegerField()
+    _application_db = IntegerField()    
+    name = CharField()
 
 
 class Rights(PPOModel):
@@ -179,15 +177,15 @@ class Rights(PPOModel):
             KEY `Rights_data_id` (`data_id`)
             ) ENGINE=InnoDB AUTO_INCREMENT=4562521 DEFAULT CHARSET=latin1;
     '''
-    granted = models.BooleanField()
-    delegated = models.BooleanField()
-    data_id = models.CharField()
-    data_type = models.CharField()
-    application = models.IntegerField()
-    _application_db = models.IntegerField()
-    name = models.CharField()
-    scope = models.IntegerField()
-    _scope_db = models.IntegerField()
+    granted = BooleanField()
+    delegated = BooleanField()
+    data_id = CharField()
+    data_type = CharField()
+    application = IntegerField()
+    _application_db = IntegerField()
+    name = CharField()
+    scope = IntegerField()
+    _scope_db = IntegerField()
 
 
 class Scope(PPOModel):
@@ -208,10 +206,10 @@ class Scope(PPOModel):
             UNIQUE KEY `Scope_unique_0` (`name`,`application`)
             ) ENGINE=InnoDB AUTO_INCREMENT=165536 DEFAULT CHARSET=latin1;
     '''
-    application = models.IntegerField()
-    _application_db = models.IntegerField()
-    name = models.CharField()
-    description = models.CharField()
+    application = IntegerField()
+    _application_db = IntegerField()
+    name = CharField()
+    description = CharField()
 
 
 class Session(PPOModel):
@@ -232,10 +230,10 @@ class Session(PPOModel):
             UNIQUE KEY `Session_unique_0` (`session_id`,`user`)
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     '''
-    session_id = models.CharField()
-    user = models.IntegerField()
-    _user_db = models.IntegerField()
-    creation = models.DateTimeField()
+    session_id = CharField()
+    user = IntegerField()
+    _user_db = IntegerField()
+    creation = DateTimeField()
 
 
 class SessionItem(PPOModel):
@@ -254,9 +252,9 @@ class SessionItem(PPOModel):
             PRIMARY KEY (`_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     '''
-    parameters = models.CharField()
-    page = models.CharField()
-    timestamp = models.DateTimeField()
+    parameters = CharField()
+    page = CharField()
+    timestamp = DateTimeField()
 
 
 class Session_entries(PPOModel):
@@ -276,10 +274,10 @@ class Session_entries(PPOModel):
             PRIMARY KEY (`_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     '''
-    _array_index = models.IntegerField()
-    _target_id = models.IntegerField()
-    _source_id = models.IntegerField()
-    _target_db = models.IntegerField()
+    _array_index = IntegerField()
+    _target_id = IntegerField()
+    _source_id = IntegerField()
+    _target_db = IntegerField()
 
 
 class User(PPOModel):
@@ -306,15 +304,15 @@ class User(PPOModel):
             UNIQUE KEY `User_unique_1` (`email`)
             ) ENGINE=InnoDB AUTO_INCREMENT=71290 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     '''
-    firstname = models.CharField()
-    email = models.CharField()
-    password = models.CharField()    
-    comment = models.CharField()    
-    entry_date = models.DateTimeField()
-    active = models.BooleanField()
-    lastname = models.CharField()
-    login = models.CharField()
-    email2 = models.CharField()
+    firstname = CharField()
+    email = CharField()
+    password = CharField()    
+    comment = CharField()    
+    entry_date = DateTimeField()
+    active = BooleanField()
+    lastname = CharField()
+    login = CharField()
+    email2 = CharField()
 
 
 class UserHasScope(PPOModel):
@@ -336,11 +334,11 @@ class UserHasScope(PPOModel):
             UNIQUE KEY `UserHasScope_unique_0` (`user`,`scope`)
             ) ENGINE=InnoDB AUTO_INCREMENT=83299 DEFAULT CHARSET=latin1;
     '''
-    user = models.IntegerField()
-    _user_db = models.IntegerField() 
-    scope = models.IntegerField()
-    _scope_db = models.IntegerField()    
-    granted = models.BooleanField()
+    user = IntegerField()
+    _user_db = IntegerField() 
+    scope = IntegerField()
+    _scope_db = IntegerField()    
+    granted = BooleanField()
 
 
 class UserSession(PPOModel):
@@ -370,71 +368,13 @@ class UserSession(PPOModel):
         KEY `sess_key` (`_user_db`,`user`)
         ) ENGINE=InnoDB AUTO_INCREMENT=139945626 DEFAULT CHARSET=latin1;
     '''
-    error_page = models.CharField()
-    session_id = models.CharField()    
-    error_parameters = models.CharField()
-    current_page = models.CharField()
-    timestamp = models.DateTimeField()
-    previous_page = models.CharField()
-    user = models.IntegerField()
-    _user_db = models.IntegerField()
-    current_parameters = models.CharField()
-    previous_parameters = models.CharField()
-
-
-class _metainfo(PPOModel):
-    '''
-    Table: _metainfo
-
-        fields:
-            _id, info_name, info_value
-
-        sql:
-            CREATE TABLE `_metainfo` (
-            `_id` int(11) NOT NULL AUTO_INCREMENT,
-            `info_name` varchar(255) DEFAULT NULL,
-            `info_value` varchar(255) DEFAULT NULL,
-            PRIMARY KEY (`_id`),
-            KEY `_metainfo_info_name` (`info_name`)
-            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-    '''
-    info_name = models.CharField()
-    info_value = models.CharField()    
-
-
-class _objects(PPOModel):
-    '''
-    Table: _objects
-
-        fields:
-            _id, objects
-
-        sql:
-            CREATE TABLE `_objects` (
-            `_id` int(11) NOT NULL AUTO_INCREMENT,
-            `object` varchar(255) DEFAULT NULL,
-            PRIMARY KEY (`_id`)
-            ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
-    '''
-    pass
-
-
-class _references(PPOModel):
-    '''
-    Table: _references
-
-        fields:
-            _id, _database, _backend_type, _backend_data
-
-        sql:
-            CREATE TABLE `_references` (
-            `_id` int(11) NOT NULL AUTO_INCREMENT,
-            `_database` varchar(512) DEFAULT NULL,
-            `_backend_type` varchar(255) DEFAULT NULL,
-            `_backend_data` varchar(1024) DEFAULT NULL,
-            PRIMARY KEY (`_id`)
-            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-    '''
-    _database = models.CharField()
-    _backend_type = models.CharField()
-    _backend_data = models.CharField()
+    error_page = CharField()
+    session_id = CharField()    
+    error_parameters = CharField()
+    current_page = CharField()
+    timestamp = DateTimeField()
+    previous_page = CharField()
+    user = IntegerField()
+    _user_db = IntegerField()
+    current_parameters = CharField()
+    previous_parameters = CharField()
