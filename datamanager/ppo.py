@@ -1,13 +1,25 @@
-from django.db.models import Model, IntegerField, CharField, BooleanField, DateTimeField
+from django.db.models import Model, Manager, IntegerField, CharField, BooleanField, DateTimeField
+
+
+class PPOManager(Manager):
+    '''
+    DB manager class for PPOModels
+    '''
+
+    # Set db to use WebAppBackend
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._db = 'WebAppBackend'
 
 
 class PPOModel(Model):
     '''
     Base class for PPOModels
     '''
-    _id = IntegerField()
+    _id = IntegerField(primary_key=True)
+    objects = PPOManager()
 
-    Meta:
+    class Meta:
         abstract = True
 
 
@@ -26,8 +38,11 @@ class Backend(PPOModel):
             UNIQUE KEY `Backend_unique_0` (`name`)
             ) ENGINE=InnoDB AUTO_INCREMENT=435 DEFAULT CHARSET=latin1;
     '''
-    name = CharField()
-    
+    name = CharField(max_length=100)
+
+    class Meta:
+        db_table = 'Backend'
+
 
 class Invitation(PPOModel):
     '''
@@ -54,7 +69,7 @@ class Invitation(PPOModel):
             ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
     '''
     invitation_date = DateTimeField()
-    email = CharField()
+    email = CharField(max_length=100)
     user_claimed = IntegerField()
     _user_claimed_db = IntegerField()
     user_inviting = IntegerField()
@@ -62,7 +77,10 @@ class Invitation(PPOModel):
     claimed = IntegerField()
     scope = IntegerField()
     _scope_db = IntegerField()
-    invitation_string = CharField()
+    invitation_string = CharField(max_length=100)
+
+    class Meta:
+        db_table = 'Invitation'
 
 
 class Organization(PPOModel):
@@ -88,15 +106,18 @@ class Organization(PPOModel):
             UNIQUE KEY `Organization_unique_0` (`name`)
             ) ENGINE=InnoDB AUTO_INCREMENT=6624 DEFAULT CHARSET=latin1;
     '''
-    country = CharField()
-    city = CharField()
+    country = CharField(max_length=100)
+    city = CharField(max_length=100)
     date = DateTimeField()
-    url = CharField()
-    name = CharField()
-    abbreviation = CharField()
+    url = CharField(max_length=100)
+    name = CharField(max_length=100)
+    abbreviation = CharField(max_length=100)
     scope = IntegerField()
     _scope_db = IntegerField()    
-    location = CharField()
+    location = CharField(max_length=100)
+
+    class Meta:
+        db_table = 'Organization'
 
 
 class OrganizationUsers(PPOModel):
@@ -121,6 +142,9 @@ class OrganizationUsers(PPOModel):
     organization = IntegerField()
     _organization_db = IntegerField()
 
+    class Meta:
+        db_table = 'OrganizationUsers'
+
 
 class Preferences(PPOModel):
     '''
@@ -144,12 +168,15 @@ class Preferences(PPOModel):
             KEY `Preferences_value` (`value`)
             ) ENGINE=InnoDB AUTO_INCREMENT=1786443 DEFAULT CHARSET=latin1;
     '''
-    value = CharField()
+    value = CharField(max_length=100)
     user = IntegerField()
     _user_db = IntegerField()
     application = IntegerField()
     _application_db = IntegerField()    
-    name = CharField()
+    name = CharField(max_length=100)
+
+    class Meta:
+        db_table = 'Preferences'
 
 
 class Rights(PPOModel):
@@ -179,13 +206,16 @@ class Rights(PPOModel):
     '''
     granted = BooleanField()
     delegated = BooleanField()
-    data_id = CharField()
-    data_type = CharField()
+    data_id = CharField(max_length=100)
+    data_type = CharField(max_length=100)
     application = IntegerField()
     _application_db = IntegerField()
-    name = CharField()
+    name = CharField(max_length=100)
     scope = IntegerField()
     _scope_db = IntegerField()
+
+    class Meta:
+        db_table = 'Rights'
 
 
 class Scope(PPOModel):
@@ -208,8 +238,11 @@ class Scope(PPOModel):
     '''
     application = IntegerField()
     _application_db = IntegerField()
-    name = CharField()
-    description = CharField()
+    name = CharField(max_length=100)
+    description = CharField(max_length=100)
+
+    class Meta:
+        db_table = 'Scope'
 
 
 class Session(PPOModel):
@@ -230,10 +263,13 @@ class Session(PPOModel):
             UNIQUE KEY `Session_unique_0` (`session_id`,`user`)
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     '''
-    session_id = CharField()
+    session_id = CharField(max_length=100)
     user = IntegerField()
     _user_db = IntegerField()
     creation = DateTimeField()
+
+    class Meta:
+        db_table = 'Session'
 
 
 class SessionItem(PPOModel):
@@ -252,9 +288,12 @@ class SessionItem(PPOModel):
             PRIMARY KEY (`_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     '''
-    parameters = CharField()
-    page = CharField()
+    parameters = CharField(max_length=100)
+    page = CharField(max_length=100)
     timestamp = DateTimeField()
+
+    class Meta:
+        db_table = 'SessionItem'
 
 
 class Session_entries(PPOModel):
@@ -278,6 +317,9 @@ class Session_entries(PPOModel):
     _target_id = IntegerField()
     _source_id = IntegerField()
     _target_db = IntegerField()
+
+    class Meta:
+        db_table = 'Session_entries'
 
 
 class User(PPOModel):
@@ -304,15 +346,18 @@ class User(PPOModel):
             UNIQUE KEY `User_unique_1` (`email`)
             ) ENGINE=InnoDB AUTO_INCREMENT=71290 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     '''
-    firstname = CharField()
-    email = CharField()
-    password = CharField()    
-    comment = CharField()    
+    firstname = CharField(max_length=100)
+    email = CharField(max_length=100)
+    password = CharField(max_length=100)    
+    comment = CharField(max_length=100)    
     entry_date = DateTimeField()
     active = BooleanField()
-    lastname = CharField()
-    login = CharField()
-    email2 = CharField()
+    lastname = CharField(max_length=100)
+    login = CharField(max_length=100)
+    email2 = CharField(max_length=100)
+
+    class Meta:
+        db_table = 'User'
 
 
 class UserHasScope(PPOModel):
@@ -339,6 +384,9 @@ class UserHasScope(PPOModel):
     scope = IntegerField()
     _scope_db = IntegerField()    
     granted = BooleanField()
+
+    class Meta:
+        db_table = 'UserHasScope'
 
 
 class UserSession(PPOModel):
@@ -368,13 +416,16 @@ class UserSession(PPOModel):
         KEY `sess_key` (`_user_db`,`user`)
         ) ENGINE=InnoDB AUTO_INCREMENT=139945626 DEFAULT CHARSET=latin1;
     '''
-    error_page = CharField()
-    session_id = CharField()    
-    error_parameters = CharField()
-    current_page = CharField()
+    error_page = CharField(max_length=100)
+    session_id = CharField(max_length=100)    
+    error_parameters = CharField(max_length=100)
+    current_page = CharField(max_length=100)
     timestamp = DateTimeField()
-    previous_page = CharField()
+    previous_page = CharField(max_length=100)
     user = IntegerField()
     _user_db = IntegerField()
-    current_parameters = CharField()
-    previous_parameters = CharField()
+    current_parameters = CharField(max_length=100)
+    previous_parameters = CharField(max_length=100)
+
+    class Meta:
+        db_table = 'UserSession'

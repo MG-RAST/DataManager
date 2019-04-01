@@ -24,21 +24,31 @@ DBPORT=${DBPORT:-"5432"}
 WAIT_FOR="wait-for $DBHOST:$DBPORT --"
 START_CMD="runserver $DJANGO_HOST:$DJANGO_PORT"
 
-if [ "$1" = "start" ]; then
-
-    if [ -n $DEBUG ]; then
-        if [ "$DJANGO_HOST" = "0.0.0.0" ] && [ "$DEBUG" != "OVERRIDE" ]; then
-            START_CMD="runserver_plus $DJANGO_HOST:$DJANGO_PORT --reloader-interval 5"
-        else
-            echo $WARNING; exit -1;
+case $1 in
+    "start" )
+        if [ -n $DEBUG ]; then
+            if [ "$DJANGO_HOST" = "0.0.0.0" ] && [ "$DEBUG" != "OVERRIDE" ]; then
+                START_CMD="runserver_plus $DJANGO_HOST:$DJANGO_PORT --reloader-interval 5"
+            else
+                echo $WARNING; exit -1;
+            fi
         fi
-    fi
-
-    exec $WAIT_FOR python3 manage.py $START_CMD
-
-elif [ "$1" = "manage" ]; then
-    shift
-    exec $WAIT_FOR python3 manage.py $@
-fi
+        exec $WAIT_FOR python3 manage.py $START_CMD 
+        break;;
+    "manage" ) 
+        shift; 
+        exec $WAIT_FOR python3 manage.py $@
+        break;;
+    "runscript" ) 
+        shift
+        if [ $# > 1 ]; then
+            script=$1
+            shift
+            exec python3 manage.py runscript $script --script-args="$@"
+        else
+            exec python3 manage.py runscript $@
+        fi
+        break;;
+esac
 
 exec "$@"

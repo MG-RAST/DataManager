@@ -1,8 +1,8 @@
 import os
 
 # App settings model
-WSGI_APPLICATION = 'DataManager.wsgi.application'
-ROOT_URLCONF = 'DataManager.urls'
+WSGI_APPLICATION = 'datamanager.wsgi.application'
+ROOT_URLCONF = 'datamanager.urls'
 
 # --------------------------------------------------------------#
 # Enviroment Override Settings                                  #
@@ -22,10 +22,13 @@ ROOT_URLCONF = 'DataManager.urls'
 env=os.environ.get
 
 DJANGO_PORT = env('DJANGO_PORT')
-ALLOWED_HOSTS = [env('DJANGO_ALLOWED_HOSTS', '*')]
+ALLOWED_HOSTS = [env('DJANGO_ALLOWED_HOSTS', 'localhost')]
+
 DEBUG = env('DJANGO_DEBUG', True)
+
+SECRET_KEY = env('DJANGO_SECRET_KEY', 'f^xfiqa4bb=)2vpc39%z#845*i&@2l5$9hzenefc0lvpu!d(15')
 BASE_DIR = env('DJANGO_BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SECRET_KEY = env('DJANGO_SECRET_KEY', '1q+1hce++u&uhek_)f2c7xju%e&(e^0a&9_2i&w*1_ej7+5ivh')
+STATICFILES_DIRS = ['{}/static/'.format(BASE_DIR)]
 
 DATABASES = {
     # PGSQL Main db
@@ -46,9 +49,9 @@ DATABASES = {
     #    'PORT': int(env('ROACH_DBPORT', 26257))
     #},
     # Legacy mysql db
-    'ppo': {
+    'WebAppBackend': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'JobDB',
+        'NAME': 'WebAppBackend',
         'PASSWORD': 'mypwd',
         'HOST': 'mysql',
         'PORT': 3306
@@ -71,7 +74,7 @@ INSTALLED_APPS = [
     'guardian',
     'rest_framework',
     'notifications',
-    'DataManager.DataManagerAppConfig',
+    'datamanager.DataManagerConfig',
 ]
 
 MIDDLEWARE = [
@@ -137,7 +140,7 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['console'],
-            'level': 'ERROR'
+            'level': 'DEBUG'
         },
         'werkzeug': {
             'handlers': ['console'],
