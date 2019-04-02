@@ -1,3 +1,5 @@
+#!/bin/env python
+
 from datamanager.ppo import User as WebAppUser
 from datamanager.models import UserSerializer
 
@@ -18,10 +20,8 @@ def import_users(dryrun=False):
         is_staff, is_active, is_superuser, last_login, date_joined
     '''
     to_json = JSONRenderer().render
-
-    counts = {'new': }
-    for u in WebAppUser.objects.all()[:10]:
-        kwargs = {
+    for u in WebAppUser.objects.all():
+        user = User({
             "username": u.login,
             "first_name": u.firstname,
             "last_name": u.lastname,
@@ -29,17 +29,14 @@ def import_users(dryrun=False):
             "password": u.password,
             "date_joined": u.entry_date,
             "is_active": u.active,
-        }
-
-        user = User(**kwargs)
+        })
         if dryrun:
             logger.info(to_json(data=UserSerializer(user).data).decode())
         else:
             try:
                 user.save()
             except:
-
-                pass
+                continue
 
 def run(*script_args):
     '''

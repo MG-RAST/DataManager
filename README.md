@@ -1,25 +1,29 @@
 # DataManager
+ 
+## Getting started
 
-## Useful django manage commands
+Create a local directory for persisent postgres data. Copy `env-template` to `.env` and fill in `###REQUIRED###` values. A new django secret key can be generated at https://djskgen.herokuapp.com/.
 
-```
-# Start server:
-docker-compose run web manage start
+### Start server:
+```docker-compose up```
 
-# Initialize db:
-docker-compose run web manage migrate
+### Initialize db:
+```docker-compose exec django python manage.py migrate```
 
-# Create initial admin user:
-docker-compose run web manage createsuperuser 
+### Create initial admin user:
+```docker-compose exec django python manage.py createsuperuser``` 
 
-# Python shell on container:
-docker-compose run web manage shell
 
-# DB shell on container:    
-docker-compose run web manage dbshell 
+## Other useful commands
 
-# Run `manage` without arguement for a full list of commands:
-docker-compose run web manage
-```
+### Python shell on container:
+```docker-compose exec django python manage.py shell```
+
+### DB shell on container:    
+```docker-compose exec django python manage.py dbshell```
+
+### Run `manage` without arguement for a full list of commands:
+```docker-compose exec django python manage.py```
+
 
 

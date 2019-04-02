@@ -4,58 +4,52 @@ import os
 WSGI_APPLICATION = 'datamanager.wsgi.application'
 ROOT_URLCONF = 'datamanager.urls'
 
-# --------------------------------------------------------------#
-# Enviroment Override Settings                                  #
-# --------------------------------------------------------------#
-# usage      : names                                            #
-# -----------:--------------------------------------------------#
-# default db : DBNAME, DBUSER, DBPASSWORD, DBHOST, DBPORT       #
-# -----------:--------------------------------------------------#
-# roachdb    : ROACH_DBNAME, ROACH_USER, ROACH_DBPASSWORD,      #
-#            : ROACH_DBHOST, ROACH_DBPORT                       #
-# -----------:--------------------------------------------------#
-# django     : DJANGO_DEBUG, DJANGO_BASE_DIR, DJANGO_SECRET_KEY,#
-#            : DJANGO_PORT, DJANGO_ALLOWED_HOSTS                #
-# --------------------------------------------------------------#
-
 # Alias environ getter for legiblity
 env=os.environ.get
 
 DJANGO_PORT = env('DJANGO_PORT')
-ALLOWED_HOSTS = [env('DJANGO_ALLOWED_HOSTS', 'localhost')]
+ALLOWED_HOSTS = [env('DJANGO_ALLOWED_HOSTS')]
 
-DEBUG = env('DJANGO_DEBUG', True)
+DEBUG = env('DJANGO_DEBUG')
 
-SECRET_KEY = env('DJANGO_SECRET_KEY', 'f^xfiqa4bb=)2vpc39%z#845*i&@2l5$9hzenefc0lvpu!d(15')
-BASE_DIR = env('DJANGO_BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SECRET_KEY = env('DJANGO_SECRET_KEY')
+BASE_DIR = env('DJANGO_BASE_DIR')
 STATICFILES_DIRS = ['{}/static/'.format(BASE_DIR)]
 
+# Main datamanager django db
+psql_conf = {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': env('POSTGRES_DB'),
+    'USER': env('POSTGRES_USER'),
+    'PASSWORD': env('POSTGRES_PASSWORD'),
+    'HOST': env('POSTGRES_HOST'),
+    'PORT': int(env('POSTGRES_PORT'))
+}
+
+# Experimental cockroach db:
+# Currently unable to support Django required tables
+# See: cockroachdb/cockroachdb-python/pull/14 for details
+roach_conf = { 
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': env('ROACH_DB'),
+    'USER': env('ROACH_USER'),
+    'HOST': env('ROACH_HOST'),
+    'PORT': int(env('ROACH_PORT'))
+}
+
+# Dump of WebAppBackend from MG-RAST
+mgrast_dump_conf = {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': env('MYSQL_DB'),
+    'PASSWORD': env('MYSQL_PASSWORD'),
+    'HOST': env('MYSQL_HOST'),
+    'PORT': int(env('MYSQL_PORT'))
+}
+
 DATABASES = {
-    # PGSQL Main db
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DBNAME', 'maindb'),
-        'USER': env('DBUSER', 'www_user'),
-        'PASSWORD': env('DBPASSWORD','www_passwrd'),
-        'HOST': env('DBHOST','postgresql'),
-        'PORT': int(env('DBPORT', 5432))
-    },
-    # Experimental CockroachDB
-    #'roach': { 
-    #    'ENGINE': 'django.db.backends.postgresql',
-    #    'NAME': env('ROACH_DBNAME', 'expdb'),
-    #    'USER': env('ROACH_DBUSER', 'www_user'),
-    #    'HOST': env('ROACH_DBHOST', 'roachdb'),
-    #    'PORT': int(env('ROACH_DBPORT', 26257))
-    #},
-    # Legacy mysql db
-    'WebAppBackend': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'WebAppBackend',
-        'PASSWORD': 'mypwd',
-        'HOST': 'mysql',
-        'PORT': 3306
-    },
+    'default': psql_conf,
+    #'roach': roach_conf,
+    'WebAppBackend': mgrast_dump_conf,
 }
 
 # Internationalization settings
@@ -128,24 +122,50 @@ AUTH_PASSWORD_VALIDATORS = [
 #NOTIFICATIONS_USE_WEBSOCKET = True
 #NOTIFICATIONS_RABBIT_MQ_URL = 'message-bus'
 
-LOGGING = {
+LOGGING_CONFIG = None
+
+import logging.config
+logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[{server_time}] {message}',
+            'style': '{',
+        }
+    },
     'handlers': {
+        'django.server': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
-        '': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
-        },
-        'werkzeug': {
+        'datamanager': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        '': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
     },
-}
+})
+

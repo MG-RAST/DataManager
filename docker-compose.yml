@@ -7,81 +7,104 @@ services:
     container_name: traefik
     command: -c /etc/traefik/traefik.toml
     ports:
-      - "8080:8080" # Dashboard port
+      - "8080:8080"
     volumes:
       - ./services/conf/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
 
   postgresql:
     image: postgres
-    container_name: postgresql
+    container_name: $POSTGRES_HOST
     environment: 
-      - "POSTGRES_USER=www_user"
-      - "POSTGRES_PASSWORD=www_passwrd"
-      - "POSTGRES_DB=maindb"
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
     volumes:
-      - ./services/postgres_data:/var/lib/postgresql/data
+      - $POSTGRES_DATA:/var/lib/postgresql/data
     ports: 
-      - "5432:5432"
+      - $POSTGRES_PORT:$POSTGRES_PORT
 
   #roachdb:
-  #  # Connection url "postgresql://www_user@roachdb:26257?sslmode=disable"
   #  image: cockroachdb/cockroach
-  #  container_name: roachdb
-  #  command: start --insecure --listen-addr=roachdb:26257
+  #  container_name: $ROACH_HOST
+  #  command: start --insecure --listen-addr=roachdb:$ROACH_PORT
   #  labels:
-  #    - "traefik.domain=mg-rast.local"
-  #    - "traefik.backend=roachdb-ui"
-  #    - "traefik.enable=true"
-  #    - "traefik.port=8800"
+  #    - traefik.domain=$DOMAIN
+  #    - traefik.backend=roachdb-ui
+  #    - traefik.enable=true
+  #    - traefik.port=$ROACH_UI_PORT
   #  volumes:
-  #    - ./services/roach_data:/cockroach/cockroach-data
+  #    - $ROACH_DATA:/cockroach/cockroach-data
   #  ports: 
-  #    - "8800:8080"
-  #    - "26257:26257"
+  #    - $ROACH_UI_PORT:8080
+  #    - $ROACH_PORT
 
   mysql:
     image: mysql:5.7 
-    container_name: mysql
-    command: --skip-name-resolve --bind-address=0.0.0.0 --log-error-verbosity 2
+    container_name: $MYSQL_HOST
+    command: --skip-name-resolve --bind-address=0.0.0.0 --log-error-verbosity 1
     environment:
-      - "MYSQL_ROOT_PASSWORD=mypwd"
+      - MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
     ports:
-      - "3306:3306"
+      - $MYSQL_PORT:$MYSQL_PORT
     volumes:
-      - ./services/mysql_data:/var/lib/mysql
+      - $MYSQL_DATA:/var/lib/mysql
 
   #rabbit:
   #  image: "rabbitmq:3.7-management-alpine"
-  #  container_name: rabbit
+  #  container_name: $RABBIT_HOST
   #  labels:
-  #    - "traefik.domain=mg-rast.local"
-  #    - "traefik.backend=message-bus_admin"
-  #    - "traefik.enable=true"
+  #    - traefik.domain=$DOMAIN
+  #    - traefik.backend=rabbit_admin
+  #    - traefik.enable=true
   #  volumes:
-  #    - ./services/conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-  #    - rabbitdata:/var/lib/rabbitmq
+  #    - $RABBIT_CONF:/etc/rabbitmq/rabbitmq.conf
+  #    - $RABBIT_DATA:/var/lib/rabbitmq
   #  ports:
-  #    - "8888:15672" # Admin UI port
-  #    - "5672"
+  #    - $RABBIT_UI_PORT:15672 # Admin UI port
+  #    - $RABBIT_PORT
 
   django:
     build: .
-    container_name: django
+    container_name: $DJANGO_HOST
     command: start
     labels:
-      - "traefik.domain=mg-rast.local"
-      - "traefik.backend=django"
-      - "traefik.enable=true"
+      - traefik.domain=$DOMAIN
+      - traefik.backend=django
+      - traefik.enable=true
+    environment:
+      - DJANGO_DEBUG=$DJANGO_DEBUG
+      - DJANGO_CMD=$DJANGO_CMD
+      - DJANGO_CMD_OPTIONS=$DJANGO_CMD_OPTIONS
+      - DJANGO_HOST=$DJANGO_HOST
+      - DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS
+      - DJANGO_PORT=$DJANGO_PORT
+      - DJANGO_BASE_DIR=$DJANGO_BASE_DIR
+      - DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
+      - POSTGRES_HOST=$POSTGRES_HOST
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_PORT=$POSTGRES_PORT
+      - MYSQL_HOST=$MYSQL_HOST
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_DB=$MYSQL_DB
+      - MYSQL_PORT=$MYSQL_PORT
+      - ROACH_HOST=$ROACH_HOST
+      - ROACH_USER=$ROACH_USER
+      - ROACH_DB=$ROACH_DB
+      - ROACH_PORT=$ROACH_PORT
+      - RABBIT_HOST=$RABBIT_HOST
+      - RABBIT_PORT=$RABBIT_PORT
     volumes:
       - .:/usr/src/app
-      - ./services/conf:/usr/src/app/services
     ports:
-      - "80:8000"
+      - "80:$DJANGO_PORT"
     depends_on:
-      - postgresql
-      #- roachdb
-      - mysql
+      - $POSTGRES_HOST
+      #- $RABBIT_HOST
+      #- $ROACH_HOST
+      - $MYSQL_HOST
 
 volumes:
   rabbitdata:

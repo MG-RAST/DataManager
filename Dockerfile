@@ -3,8 +3,8 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /usr/src/app
 
-COPY ./docker-entrypoint.sh /docker-entrypoint.sh
-COPY ./services/wait-for /bin/wait-for
+COPY ./scripts/docker-entrypoint.sh /bin/docker-entrypoint.sh
+COPY ./scripts/wait-for-postgres.sh /bin/wait-for-postgres.sh
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["start"]

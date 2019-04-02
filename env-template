@@ -1,0 +1,40 @@
+# django settings
+DOMAIN=datamanager.local
+DJANGO_CMD=runserver_plus
+DJANGO_CMD_OPTIONS=--reloader-interval 5
+DJANGO_DEBUG=TRUE
+DJANGO_HOST=django
+DJANGO_PORT=8000
+DJANGO_ALLOWED_HOSTS=localhost
+DJANGO_BASE_DIR=/usr/src/app
+DJANGO_SECRET_KEY=###REQUIRED###
+
+# postgres setting
+POSTGRES_HOST=postgresql
+POSTGRES_DB=datamanager
+POSTGRES_PORT=5432
+POSTGRES_USER=pguser
+POSTGRES_PASSWORD=pgpassword
+POSTGRES_DATA=###REQUIRED###
+
+# mysql setting
+MYSQL_HOST=mysql
+MYSQL_DB=WebAppBackend
+MYSQL_PORT=3306
+MYSQL_PASSWORD=###OPTIONAL###
+MYSQL_DATA=###OPTIONAL###
+
+# cockroachdb settings
+ROACH_HOST=roachdb
+ROACH_PORT=26257
+ROACH_UI_PORT=8800
+ROACH_USER=###OPTIONAL###
+ROACH_DB=###OPTIONAL###
+ROACH_DATA=###OPTIONAL###
+
+# rabbitmq settings
+RABBIT_HOST=rabbit
+RABBIT_PORT=5672
+RABBIT_UI_PORT=8888
+RABBIT_CONF=./conf/rabbitmq.conf
+RABBIT_DATA=###OPTIONAL###
