@@ -1,36 +1,110 @@
 version: '3'
 
 services:
-  db:
+
+  traefik:
+    image: traefik:1.7-alpine 
+    container_name: traefik
+    command: -c /etc/traefik/traefik.toml
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./services/conf/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  postgresql:
     image: postgres
+    container_name: $POSTGRES_HOST
     environment: 
-      - POSTGRES_USER:datamanager
-      - POSTGRES_PASSWORD:1234
-      - POSTGRES_DB:datamanager
-    volumes: 
-      - psql_data:/var/lib/postgresql/data
-  web:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+    volumes:
+      - $POSTGRES_DATA:/var/lib/postgresql/data
+    ports: 
+      - $POSTGRES_PORT:$POSTGRES_PORT
+
+  #roachdb:
+  #  image: cockroachdb/cockroach
+  #  container_name: $ROACH_HOST
+  #  command: start --insecure --listen-addr=roachdb:$ROACH_PORT
+  #  labels:
+  #    - traefik.domain=$DOMAIN
+  #    - traefik.backend=roachdb-ui
+  #    - traefik.enable=true
+  #    - traefik.port=$ROACH_UI_PORT
+  #  volumes:
+  #    - $ROACH_DATA:/cockroach/cockroach-data
+  #  ports: 
+  #    - $ROACH_UI_PORT:8080
+  #    - $ROACH_PORT
+
+  mysql:
+    image: mysql:5.7 
+    container_name: $MYSQL_HOST
+    command: --skip-name-resolve --bind-address=0.0.0.0 --log-error-verbosity 1
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
+    ports:
+      - $MYSQL_PORT:$MYSQL_PORT
+    volumes:
+      - $MYSQL_DATA:/var/lib/mysql
+
+  #rabbit:
+  #  image: "rabbitmq:3.7-management-alpine"
+  #  container_name: $RABBIT_HOST
+  #  labels:
+  #    - traefik.domain=$DOMAIN
+  #    - traefik.backend=rabbit_admin
+  #    - traefik.enable=true
+  #  volumes:
+  #    - $RABBIT_CONF:/etc/rabbitmq/rabbitmq.conf
+  #    - $RABBIT_DATA:/var/lib/rabbitmq
+  #  ports:
+  #    - $RABBIT_UI_PORT:15672 # Admin UI port
+  #    - $RABBIT_PORT
+
+  django:
     build: .
-    image: web
-    command: python manage.py runserver 0.0.0.0:8000
+    container_name: $DJANGO_HOST
+    command: start
+    labels:
+      - traefik.domain=$DOMAIN
+      - traefik.backend=django
+      - traefik.enable=true
+    environment:
+      - DJANGO_DEBUG=$DJANGO_DEBUG
+      - DJANGO_CMD=$DJANGO_CMD
+      - DJANGO_CMD_OPTIONS=$DJANGO_CMD_OPTIONS
+      - DJANGO_HOST=$DJANGO_HOST
+      - DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS
+      - DJANGO_PORT=$DJANGO_PORT
+      - DJANGO_BASE_DIR=$DJANGO_BASE_DIR
+      - DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
+      - POSTGRES_HOST=$POSTGRES_HOST
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_PORT=$POSTGRES_PORT
+      - MYSQL_HOST=$MYSQL_HOST
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_DB=$MYSQL_DB
+      - MYSQL_PORT=$MYSQL_PORT
+      - ROACH_HOST=$ROACH_HOST
+      - ROACH_USER=$ROACH_USER
+      - ROACH_DB=$ROACH_DB
+      - ROACH_PORT=$ROACH_PORT
+      - RABBIT_HOST=$RABBIT_HOST
+      - RABBIT_PORT=$RABBIT_PORT
     volumes:
       - .:/usr/src/app
     ports:
-      - "8000:8000"
+      - "80:$DJANGO_PORT"
     depends_on:
-      - db
-  message-bus:
-    image: "rabbitmq:3"
-    environment:
-      RABBITMQ_ERLANG_COOKIE: ""
-      RABBITMQ_DEFAULT_USER: "rabbitmq"
-      RABBITMQ_DEFAULT_PASS: "rabbitmq"
-      RABBITMQ_DEFAULT_VHOST: "/"
-    labels:
-      NAME: "message-bus"
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+      - $POSTGRES_HOST
+      #- $RABBIT_HOST
+      #- $ROACH_HOST
+      - $MYSQL_HOST
 
-volumes: 
-  psql_data:
+volumes:
+  rabbitdata:
