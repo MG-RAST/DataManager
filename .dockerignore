@@ -1,7 +1,0 @@
-.DS_Store
-.git
-.gitignore
-services
-!services/wait-for
-Dockerfile
-README.md
