@@ -25,7 +25,7 @@ docker-compose up
 ### DB shell on container:    
 ```docker-compose exec django python manage.py dbshell```
 
-### Run `manage` without arguement for a full list of commands:
+### Run `manage.py` without arguments for a full list of django commands:
 ```docker-compose exec django python manage.py```
 
 
