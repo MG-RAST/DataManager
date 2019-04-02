@@ -6,7 +6,7 @@ Create a local directory for persisent postgres data. Copy `env-template` to `.e
 
 ### Start server:
 ```
-docker build -t mgrast/django-base -f Docker.base .
+docker build -t mgrast/django-base -f Dockerfile.base .
 docker-compose up
 ```
 
