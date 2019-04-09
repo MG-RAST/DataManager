@@ -1,0 +1,59 @@
+{% extends "seqcenter/base_site.html" %}
+{% load static admin_urls %}
+
+{% block breadcrumbs %}
+    {% if not is_popup %}
+        <ul class="grp-horizontal-list">
+            <li><a href="{% url 'seqcenter:index' %}">Home</a></li>
+            <li>User Account</li>
+        </ul>
+    {% endif %}
+{% endblock %}
+{% block title %}Password change{% endblock %}
+{% block content-class %}{% endblock %}
+
+{% block content %}
+{#<h1>Password change</h1>#}
+<div class="g-d-c">
+    <div class="g-d-12">
+        <div class="grp-rte">
+            <p>Enter a new password for the user <strong>{{ username }}</strong>.</p>
+        </div>
+        {% if form.errors %}
+            <p class="errornote">{% if form.errors.items|length == 1 %}Please correct the error below." %}{% else %}Please correct the errors below." %}{% endif %}</p>
+        {% endif %}
+        <form action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+            {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+            <fieldset class="module grp-module">
+                <div class="form-row grp-row{% if form.password1.errors %} grp-errors{% endif %}">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="id_new_password1" class="required">New password</label></div>
+                        <div class="c-2">
+                            {{ form.password1 }}
+                            {{ form.password1.errors }}
+                            {% if form.password1.help_text %}
+                                <p class="grp-help">{{ form.password1.help_text|safe }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row grp-row{% if form.password2.errors %} grp-errors{% endif %}">
+                    <div class="l-2c-fluid l-d-4">
+                        <div class="c-1"><label for="id_new_password2" class="required">Password (again)</label></div>
+                        <div class="c-2">
+                            {{ form.password2 }}
+                            {{ form.password2.errors }}
+                            <p class="grp-help">Enter the same password as above, for verification.</p>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="grp-module grp-submit-row">
+                <ul>
+                    <li><input type="submit" value="Change password" class="grp-default" /></li>
+                </ul>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

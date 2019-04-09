@@ -7,9 +7,9 @@ services:
     container_name: traefik
     command: -c /etc/traefik/traefik.toml
     ports:
-      - "8080:8080"
+      - 8080:8080
     volumes:
-      - ./services/conf/traefik.toml:/etc/traefik/traefik.toml
+      - ./conf/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
 
   postgresql:
@@ -23,6 +23,29 @@ services:
       - $POSTGRES_DATA:/var/lib/postgresql/data
     ports: 
       - $POSTGRES_PORT:$POSTGRES_PORT
+
+  mongodb:
+    image: bitnami/mongodb:latest
+    container_name: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/bitnami
+
+  shock:
+    image: mgrast/shock
+    container_name: shock
+    command: shock-server -conf /usr/local/shock/shock.conf
+    ports: 
+      - 7445:7445
+    labels: 
+      - traefik.domain=$DOMAIN
+      - traefik.backend=shock
+      - traefik.enable=true
+    volumes:
+      - ./conf/shock.conf:/usr/local/shock/shock.conf
+    depends_on:
+      - mongodb
 
   #roachdb:
   #  image: cockroachdb/cockroach
@@ -39,16 +62,16 @@ services:
   #    - $ROACH_UI_PORT:8080
   #    - $ROACH_PORT
 
-  mysql:
-    image: mysql:5.7 
-    container_name: $MYSQL_HOST
-    command: --skip-name-resolve --bind-address=0.0.0.0 --log-error-verbosity 1
-    environment:
-      - MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
-    ports:
-      - $MYSQL_PORT:$MYSQL_PORT
-    volumes:
-      - $MYSQL_DATA:/var/lib/mysql
+  #mysql:
+  #  image: mysql:5.7 
+  #  container_name: $MYSQL_HOST
+  #  command: --skip-name-resolve --bind-address=0.0.0.0 --log-error-verbosity 1
+  #  environment:
+  #    - MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
+  #  ports:
+  #    - $MYSQL_PORT:$MYSQL_PORT
+  #  volumes:
+  #    - $MYSQL_DATA:/var/lib/mysql
 
   #rabbit:
   #  image: "rabbitmq:3.7-management-alpine"
@@ -99,12 +122,13 @@ services:
     volumes:
       - .:/usr/src/app
     ports:
-      - "80:$DJANGO_PORT"
+      - 80:$DJANGO_PORT
     depends_on:
       - $POSTGRES_HOST
       #- $RABBIT_HOST
       #- $ROACH_HOST
-      - $MYSQL_HOST
+      #- $MYSQL_HOST
 
 volumes:
   rabbitdata:
+  mongodb_data:

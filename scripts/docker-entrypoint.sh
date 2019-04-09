@@ -4,11 +4,11 @@ set -e
 case $1 in
     "start" )
         wait-for-postgres.sh python manage.py $DJANGO_CMD ${DJANGO_HOST}:${DJANGO_PORT} $DJANGO_CMD_OPTIONS
-        break;;
+        exit;;
     "manage" ) 
         shift; 
         wait-for-postgres.sh python3 manage.py $@
-        break;;
+        exit;;
     "runscript" ) 
         shift
         if [ $# > 1 ]; then
@@ -18,7 +18,7 @@ case $1 in
         else
             wait-for-postgres.sh python3 manage.py runscript $@
         fi
-        break;;
+        exit;;
 esac
 
 exec "$@"

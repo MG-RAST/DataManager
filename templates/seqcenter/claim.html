@@ -1,0 +1,24 @@
+{% extends "seqcenter/base.html" %}
+
+{% block content %}
+<div class="g-d-10" style="height: 1px"></div>
+<div class="g-d-10">
+  <h3>Claim token</h3>
+  <p>
+    A user of Argonne Sequencing Center wants to share data with you. If the
+    data was shared to an email address other than one registered to your
+    account please add this additional email address to your account via the
+    account page.
+  </p>
+  {% if request.user.is_authenticated is True %}
+    <form>{% csrf_token %}
+      <button type="submit" class="btn">Claim</button>
+    </form>
+  {% elif form == "login" %}
+    {% include "user_login_form.html" %}
+  {% else %}
+    {% include "user_register_form.html" %}
+  {% endif %}
+</div>
+<div class="g-d-10" style="height: 1px"></div>
+{% endblock %}

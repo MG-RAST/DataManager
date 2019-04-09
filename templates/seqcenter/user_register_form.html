@@ -1,0 +1,19 @@
+<div>
+  <h3>Register User</h3>
+  <form method="post">{% csrf_token %}
+    <input type="hidden" name="action" value="register_user">
+    <fieldset>
+        <label for="user">Full name</label>
+        <input type="text" class="span5" placeholder="firstname lastname" name="fullname" id="id_fullname">
+        <label for="login">Username</label>
+        <input type="text" class="span5" placeholder="username" name="username" id="id_username">
+        <label for="email">Email</label>
+        <input type="text" class="span5" placeholder="person@email.com" name="email" id="id_email">
+        <label for="password">Password</label>
+        <input type="password" class="span5" placeholder="password" name="password" id="id_password">
+        <div class="input-append">
+          <button type="submit" class="btn">register</button>
+        </div>
+    </fieldset>
+  </form>
+</div>

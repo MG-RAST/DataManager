@@ -1,7 +1,7 @@
 import os
 
 # App settings model
-WSGI_APPLICATION = 'datamanager.wsgi.application'
+WSGI_APPLICATION = 'datamanager.apps.application'
 ROOT_URLCONF = 'datamanager.urls'
 
 # Alias environ getter for legiblity
@@ -14,7 +14,6 @@ DEBUG = env('DJANGO_DEBUG')
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 BASE_DIR = env('DJANGO_BASE_DIR')
-STATICFILES_DIRS = ['{}/static/'.format(BASE_DIR)]
 
 # Main datamanager django db
 psql_conf = {
@@ -49,7 +48,7 @@ mgrast_dump_conf = {
 DATABASES = {
     'default': psql_conf,
     #'roach': roach_conf,
-    'WebAppBackend': mgrast_dump_conf,
+    #'WebAppBackend': mgrast_dump_conf,
 }
 
 # Internationalization settings
@@ -57,11 +56,18 @@ LANGUAGE_CODE, TIME_ZONE, STATIC_URL = 'en-us', 'UTC', '/static/'
 USE_L10N = USE_I18N = USE_TZ = True
 
 INSTALLED_APPS = [
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.openid',
+    'grappelli',
+    'filebrowser',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'django_extensions',
     'django_filters',
@@ -69,6 +75,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'notifications',
     'datamanager.DataManagerConfig',
+    'seqcenter.SeqCenterConfig',
 ]
 
 MIDDLEWARE = [
@@ -84,11 +91,16 @@ MIDDLEWARE = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+MEDIA_ROOT = BASE_DIR + '/media'
+STATIC_ROOT = MEDIA_ROOT + '/static'
+
 
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [],
+    'DIRS': [os.path.join(BASE_DIR, 'templates')],
     'APP_DIRS': True,
     'OPTIONS': {
         'context_processors': [
@@ -114,6 +126,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'django.contrib.auth.password_validation.NumericPasswordValidator'
     ]
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'openid': {
+        'SERVERS': [
+            dict(id='cilogin',
+                 name='CILogin',
+                 openid_url='https://cilogon.org/authorize'),
+        ]
+    }
+}
 
 # Notify package settings
 #CELERY_TASK_ALWAYS_EAGER = True
@@ -152,6 +174,11 @@ logging.config.dictConfig({
             'level': 'DEBUG',
             'propagate': False,
         },
+        'seqcenter': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
@@ -169,3 +196,12 @@ logging.config.dictConfig({
     },
 })
 
+FILEBROWSER_DEFAULT_PERMISSIONS = None
+FILEBROWSER_MAX_UPLOAD_SIZE = 10000000000
+FILEBROWSER_DIRECTORY = 'uploads/'
+FILEBROWSER_EXTENSIONS = {
+    'Sequence': ['.fasta', '.fastq'],
+    'File': ['.zip', 'tar.gz', '.dmg', '.dat'],
+    'Image': ['.jpg','.jpeg','.gif','.png','.tif','.tiff'],
+    'Document': ['.pdf','.doc','.rtf','.txt','.xls','.csv'],
+}
